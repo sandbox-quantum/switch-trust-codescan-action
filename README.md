@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@master
+        uses: actions/checkout@v5
       - name: Run Switch Trust Inventory detection
-        uses: sandbox-quantum/switch-trust-codescan-action@main
+        uses: sandbox-quantum/switch-trust-codescan-action@v6
         with:
           switch_trust_instance: https://app.flintai.dev
           switch_trust_token: ${{ secrets.SWITCH_TRUST_TOKEN }}
