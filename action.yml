@@ -46,12 +46,19 @@ runs:
 
       # Load image into the local docker cache
       - name: Load Docker image
-        run: docker load --input image.tar
+        id: load
+        run: |
+          out=$(docker load --input image.tar)
+          img=$(printf '%s\n' "$out" | sed -n -e 's/^Loaded image: //p' -e 's/^Loaded image ID: //p' | sed -n 1p)
+          [ -n "$img" ] || { echo "::error::docker load did not report an image"; exit 1; }
+          echo "image=$img" >> "$GITHUB_OUTPUT"
         shell: bash
 
       # Tag the image, so it doesn't try and pull it from the web (and then we reference the tag subsequently)
       - name: Tag image
-        run: docker tag bazel/services/aispm_inventory:latest aispm-action-test:latest
+        env:
+          SCANNER_IMAGE: ${{ steps.load.outputs.image }}
+        run: docker tag "$SCANNER_IMAGE" aispm-action-test:latest
         shell: bash
 
       # The usual way would be doing this via "uses: docker://image:tag" but that doesn't work with local images
